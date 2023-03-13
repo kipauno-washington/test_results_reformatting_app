@@ -1,2 +1,2 @@
-# test_results_reformatting_app
-Complementary to Freezerworks' test results module
+# Shiny-based Test Result Reformatting App
+## Designed to complement the implementation of Freezerworks' testing module
