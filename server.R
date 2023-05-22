@@ -29,122 +29,114 @@ server = function(input, output, session) {
   
   # Content ----
   fw_import_file = reactive({
-    # Inputs required
+    # Inputs required ----
     req(input$test_name)
     req(input$file_upload)
     
-    # Pulling in variables
+    # Pulling in variables from reference file ----
     if (input$test_name != "test_names") {
-      cat(paste0(input$test_name," selected"), fill = T)
+      cat(glue("\n\nTest name selected: {input$test_name}\n\n"), fill = T)
       quant_vars = ref[[input$test_name]][["quantitative"]]
-      cat(paste0("> Quantitative Variables: ", quant_vars), fill = T)
       qual_vars = names(ref[[input$test_name]][["qualitative"]])
-      cat(paste0("> Qualitative Variables: ",qual_vars), fill = T)
       if (!is.null(qual_vars)) {
         qual_vars_list = ref[[input$test_name]][["qualitative"]]
-        cat(paste0("> Qualitative enums: ",qual_vars_list), fill = T)
       }
     }
     
-    # File upload
-    cat(paste0("File uploaded: ", input$file_upload$datapath), fill = T)
+    # File upload ----
     # Read in as a list to look for headers
+    cat(glue("\nFile uploaded: {input$file_upload$datapath}\n"), fill = T)
     file_as_list = as.list(readLines(input$file_upload$datapath))
-    # Check for if headers aren't on first row
-    header_row = grep(gsub(" ", ".", identifier), file_as_list)
-    cat(paste0("> Header row found on line no: ",header_row,"\n"), fill = T)
     
-    # Reading the file in
+    # Check for if headers aren't on first row
+    header_row = grep(identifier, file_as_list, ignore.case = T)
+    
+    # Reading the file in as a data frame
     values = read.csv(input$file_upload$datapath, skip = header_row-1, check.names = F)
     uploaded_file = as.data.frame(values)
-
-    # Perform validation
-    cat("Validating the uploaded file..", fill = T)
-    #  Identifier
-    if (identifier %in% names(uploaded_file) == F) {
-      cat(paste0("> ",identifier," field not found"), fill = T)
-      cat(paste0("> ",names(uploaded_file)), fill = T)      
-    } else {
-      cat("> identifier field present in the file", fill = T)
+    
+    # Field name standardization ----
+    names(uploaded_file)[grep(identifier, names(uploaded_file), ignore.case = T)] = identifier
+    required_fields = c(identifier, qual_vars, quant_vars)
+    for (field in required_fields) {
+      names(uploaded_file)[grep(field, names(uploaded_file), ignore.case = T)] = field
     }
+    cat("> Field names are standardized\n\nInitiating validation of field names:", fill = T)
+    
+    # Saving the final field names for validation
+    fnames = names(uploaded_file)
+
+    # Perform validation ----
+    #  Identifier
+    cat("> Validating identifier field..", fill = T)
+    validate(
+      need(identifier %in% fnames, "Unique Test Order ID not found in the file")
+    )
+    
     #  Quantitative variable(s)
     if (!is.null(quant_vars)) {
-      if (F %in% (quant_vars %in% names(uploaded_file))) {
-        cat("> Missing quant variables in the uploaded file", fill = T)
-      } else {
-        cat("> All quant variable(s) are present", fill = T)
-      }
-    } else {
-      cat("> No quantitative field for the test", fill = T)
+      cat("> Validating quantitative variables..", fill = T)
+      validate(
+        need(all(quant_vars %in% fnames), 
+             glue("Missing quantitative variable fields: {quant_vars[quant_vars %in% fnames == F]}"))
+      )
     }
+    
     #  Qualitative variable(s)
     if (!is.null(qual_vars)) {
-      if (F %in% (qual_vars %in% names(uploaded_file))) {
-        cat("> Missing qualitative variable(s) for the assay", fill = T)
-      } else {
-        cat("> All qualitative variable(s) for the test are present", fill = T)
-      }
-    } else {
-      cat("> No qualitative variable(s) for the test name", fill = T)
-    }
-    cat("> file validation complete", fill = T)
-    
-    # Pull the appropriate fields from the file
-    required_fields = c(identifier, qual_vars, quant_vars)
-    results = uploaded_file %>% 
-      select(all_of(required_fields)) %>% 
-      na.omit() 
-    
-    # Quality check on qualitative variables if enumeration is specified
-    if (!is.null(qual_vars)) {
-      cat(paste0("\nQC check on ",length(qual_vars)," qualitative variable(s)"), fill = T)
+      cat("> Validating qualitative variable names..", fill = T)
+      validate(
+        need(all(qual_vars %in% fnames), 
+             glue("Missing qualitative variable fields: {qual_vars[qual_vars %in% fnames == F]}"))
+      )
       for(i in 1:length(qual_vars)) {
-        cat(paste0("> ",qual_vars[i]),fill = T)
+        cat("> Validating qualitative variable entries..", fill = T)
         enums = qual_vars_list[[qual_vars[i]]]
         if (!is.null(enums)) {
-          cat(">   Field has enums set: ")
-          cat(enums, sep = ", ", fill = T)
-          entries = unique(results[,qual_vars[i]])
-          if (all(enums %in% unique(uploaded_file[,qual_vars[i]]))) {
-            cat(paste0(">   ",qual_vars[i]," values are all within the set enums"), fill = T)
-          } else {
-            cat(paste0(">   Not all ",qual_vars[i]," values are within the set enums"), fill = T)
-          }
-        } else {
-          cat(paste0(">   ",qual_vars[i]," has no enums set"), fill = T)
+          entries = unique(uploaded_file[,qual_vars[i]])
+          validate(
+            need(all(entries %in% enums), glue("Values for {qual_vars[i]} are incorrect"))
+          )
         }
       }
-      # Reformat the file
-      cat("\nReformatting the qualitative variables..", fill = T)
+    }
+    
+    # Pull the required fields from the file ----
+    uploaded_file %>% 
+      select(all_of(required_fields)) %>% 
+      na.omit() -> results
+    
+    # Reformatting qualitative parameters ----
+    cat("> Validation complete\n\nInitiating reformatting:", fill = T)
+    if (!is.null(qual_vars)) {
+      cat("> Reformatting qualitative variables..", fill = T)
       qual_results = results %>%
         pivot_longer(cols = qual_vars, names_to = "Parameter Name", 
                      values_to = "Qualitative Result") %>%
         mutate(`Test Name` = input$test_name,
                `Quantitative Result` = "") %>%
         select(all_of(export_fnames))
-    } else {
-      cat("\nSkipping qualitative variable check..", fill = T)
     }
     
-    # Quantitative Parameters
+    # Reformatting quantitative parameters ----
     if (!is.null(quant_vars)) {
-      cat("\nReformatting the quantitative variables..", fill = T)
+      cat("> Reformatting quantitative variables..", fill = T)
       quant_results = results %>%
         pivot_longer(cols = quant_vars, names_to = "Parameter Name", 
                      values_to = "Quantitative Result") %>%
         mutate(`Test Name` = input$test_name,
                `Qualitative Result` = "") %>%
         select(all_of(export_fnames))
-    } else {
-      cat("\nSkipping quantitative variable check..", fill = T)
     }
     
-    cat("\nPreparing file for download..", fill = T)
+    # Binding reformatted data frames ----
     bound = rbind(qual_results, quant_results) %>% arrange(`Unique Test Order ID`)
     import_file = as.data.frame(bound)
-    cat("> Preparation complete \n", fill = T)
+    cat("> Reformatting complete\n", fill = T)
     return(import_file)
   })
+  
+  # Table rendering ----
   output$contents = renderTable(fw_import_file())
   
   # Output for Download ----

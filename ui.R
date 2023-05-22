@@ -30,7 +30,7 @@ ui = fluidPage(
       selectInput("test_name", "Test Name", choices = "test_names", selected = NULL),      
       tags$hr(),
       # File Upload
-      fileInput("file_upload", "File Upload", multiple = F, accept = c("text/csv",".csv")),
+      fileInput("file_upload", "File Upload", multiple = F, accept = ".csv"),
       tags$hr(),
       # Download
       downloadButton("download_table", "Download")),
