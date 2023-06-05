@@ -169,7 +169,7 @@ server = function(input, output, session) {
     fw_export = read.csv(input$file_upload_reporting$datapath, check.names = F)
     fw_export_fnames = names(fw_export)
     validate(
-      need(all(req_fnames_reporting %in% names(fw_export)),
+      need(all(req_fnames_rep %in% names(fw_export)),
            glue("Missing required field: {fw_export_fnames[fw_export_fnames %in% req_fnames_rep == F]}"))
     )
     

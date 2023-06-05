@@ -39,9 +39,7 @@ body = dashboardBody(
                 # Download button
                 uiOutput("download_import_btn"),
                 # Other arguments
-                width = 3,
-                headerBorder = FALSE, 
-                solidHeader = F
+                width = 3
               ),
               column(              
                 # Table output for user review if successful
@@ -63,9 +61,7 @@ body = dashboardBody(
                 # Download button
                 uiOutput("download_export_btn"),
                 # Other arguments
-                width = 3,
-                headerBorder = FALSE, 
-                solidHeader = F
+                width = 3
               ),
               column(
                 # Table output for user review if successful
