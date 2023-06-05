@@ -7,7 +7,6 @@
 # No test order id = not reformatted
 # Need to accommodate assays with either no quant or no qual parameters
 
-# Server ----
 server = function(input, output, session) {
   # Required packages ----
   require(dplyr)
@@ -22,12 +21,12 @@ server = function(input, output, session) {
   ref = read_yaml("www:/reference.yaml")
   cat("> Reference file was successfully loaded in", fill = T)
   # Serving the list of accepted test_names
-  updateSelectInput(session, "test_name", choices = names(ref), selected = "")
+  updateSelectInput(session = session, "test_name", choices = names(ref), selected = "")
   cat("> Web app ready", fill = T)
   identifier = "Unique Test Order ID"
   export_fnames = c(identifier, "Test Name", "Parameter Name", "Qualitative Result", "Quantitative Result")
   
-  # Content ----
+  # Import file reformatting ----
   fw_import_file = reactive({
     # Inputs required ----
     req(input$test_name)
@@ -59,7 +58,9 @@ server = function(input, output, session) {
     names(uploaded_file)[grep(identifier, names(uploaded_file), ignore.case = T)] = identifier
     required_fields = c(identifier, qual_vars, quant_vars)
     for (field in required_fields) {
-      names(uploaded_file)[grep(field, names(uploaded_file), ignore.case = T)] = field
+      which_name = names(uploaded_file)[grep(field, names(uploaded_file), ignore.case = T)]
+      which_name_nchar = which_name[nchar(which_name) == nchar(field)]
+      names(uploaded_file)[names(uploaded_file) == which_name_nchar] = field
     }
     cat("> Field names are standardized\n\nInitiating validation of field names:", fill = T)
     
@@ -72,14 +73,21 @@ server = function(input, output, session) {
     validate(
       need(identifier %in% fnames, "Unique Test Order ID not found in the file")
     )
+    #  Removing whitespaces in UTID
+    uploaded_file[identifier] = trimws(uploaded_file[,identifier], which = "both")
+    #  Remove trailing records without UTIDs
+    uploaded_file[,identifier][identifier == ""] = NA
+    uploaded_file = subset(uploaded_file, !is.na(uploaded_file[,identifier]))
     
     #  Quantitative variable(s)
     if (!is.null(quant_vars)) {
       cat("> Validating quantitative variables..", fill = T)
       validate(
         need(all(quant_vars %in% fnames), 
-             glue("Missing quantitative variable fields: {quant_vars[quant_vars %in% fnames == F]}"))
+             glue("Missing quantitative variable field: {quant_vars[quant_vars %in% fnames == F]}"))
       )
+      for (variable in quant_vars)
+      class(uploaded_file[,variable]) = "numeric"
     }
     
     #  Qualitative variable(s)
@@ -89,22 +97,31 @@ server = function(input, output, session) {
         need(all(qual_vars %in% fnames), 
              glue("Missing qualitative variable fields: {qual_vars[qual_vars %in% fnames == F]}"))
       )
-      for(i in 1:length(qual_vars)) {
+      # Checking for enumerator(s)
+      for(variable in qual_vars) {
+        # Trimming whitespace(s) in the qualitative variable
+        uploaded_file[variable] = trimws(uploaded_file[,variable], which = "both")
         cat("> Validating qualitative variable entries..", fill = T)
-        enums = qual_vars_list[[qual_vars[i]]]
+        enums = qual_vars_list[[variable]]
         if (!is.null(enums)) {
-          entries = unique(uploaded_file[,qual_vars[i]])
+          # Standardizing qualitative variable entry(ies)
+          for (enum in enums) {
+            which_enum = which(grepl(enum, uploaded_file[,variable], ignore.case = T) & 
+                                 nchar(uploaded_file[,variable]) == nchar(enum))
+            uploaded_file[which_enum, variable] = enum
+          }
+          # Validate qualitative variables 
+          entries = unique(uploaded_file[,variable])
           validate(
-            need(all(entries %in% enums), glue("Values for {qual_vars[i]} are incorrect"))
+            need(all(entries %in% enums), glue("Values for {variable} are incorrect"))
           )
         }
       }
     }
     
     # Pull the required fields from the file ----
-    uploaded_file %>% 
-      select(all_of(required_fields)) %>% 
-      na.omit() -> results
+    results = uploaded_file %>% 
+      select(all_of(required_fields))
     
     # Reformatting qualitative parameters ----
     cat("> Validation complete\n\nInitiating reformatting:", fill = T)
@@ -126,22 +143,100 @@ server = function(input, output, session) {
                      values_to = "Quantitative Result") %>%
         mutate(`Test Name` = input$test_name,
                `Qualitative Result` = "") %>%
+        filter(!is.na(`Quantitative Result`)) %>%
         select(all_of(export_fnames))
     }
     
-    # Binding reformatted data frames ----
+    # Returning bound and reformatted data frame ----
     bound = rbind(qual_results, quant_results) %>% arrange(`Unique Test Order ID`)
     import_file = as.data.frame(bound)
     cat("> Reformatting complete\n", fill = T)
     return(import_file)
   })
   
-  # Table rendering ----
-  output$contents = renderTable(fw_import_file())
+  # Export file reformatting ----
+  reformat_report = reactive({
+    # Inputs required ----
+    req(input$key_selection_reporting)
+    req(input$file_upload_reporting)
+    
+    # Static field name requirements ----
+    reporting_id = input$key_selection_reporting
+    req_fnames_rep = c(reporting_id, "Parameter Name", 
+                       "Qualitative Result", "Quantitative Result")
+    
+    # Validation of uploaded file ----
+    fw_export = read.csv(input$file_upload_reporting$datapath, check.names = F)
+    fw_export_fnames = names(fw_export)
+    validate(
+      need(all(req_fnames_reporting %in% names(fw_export)),
+           glue("Missing required field: {fw_export_fnames[fw_export_fnames %in% req_fnames_rep == F]}"))
+    )
+    
+    # Reformat the export ----
+    #  Quantitative variables
+    quant_fnames = req_fnames_rep[req_fnames_rep != "Qualitative Result"]
+    export_quant = fw_export %>%
+      select(all_of(quant_fnames)) %>%
+      filter(!is.na(`Quantitative Result`) & `Quantitative Result` != "") %>%
+      pivot_wider(id_cols = reporting_id, 
+                  names_from = `Parameter Name`,
+                  values_from = `Quantitative Result`)
+    
+    #  Qualitative variables
+    qual_fnames = req_fnames_rep[req_fnames_rep != "Quantitative Result"]
+    export_qual = fw_export %>%
+      select(all_of(qual_fnames)) %>%
+      filter(!is.na(`Qualitative Result`) & `Qualitative Result` != "") %>%
+      pivot_wider(id_cols = reporting_id, 
+                  names_from = `Parameter Name`,
+                  values_from = `Qualitative Result`)
+    
+    #  Join the two tables by the selected identifier
+    joined = full_join(export_quant, export_qual, by = reporting_id)
+    
+    # Return the reformatted file ----
+    export_file = as.data.frame(joined)
+    return(export_file)
+  })
+
+  # Table renderings ----
+  output$contents_import = renderTable(fw_import_file())
+  output$contents_reporting = renderTable(reformat_report())
   
-  # Output for Download ----
-  output$download_table = downloadHandler(
-    filename = paste0(tolower(gsub(" ","_",input$test_name)),"_",format(Sys.Date(), "%Y%m%d"),".csv"),
-    content = function(filename) {write.csv(fw_import_file(), filename, row.names = F)}
+  # Import tab download handling ----
+  # UI
+  output$download_import_btn = renderUI({
+    if(!is.null(input$test_name) & !is.null(input$file_upload)) {
+      downloadButton('download_table_import', 'Download')
+    }
+  })
+  
+  # Handler
+  output$download_table_import = downloadHandler(
+    filename = function() {
+      paste0(tolower(gsub(" ","_",input$test_name)),"_",format(Sys.Date(), "%Y%m%d"),".csv")
+    },
+    content = function(file) {
+      write.csv(fw_import_file(), file,row.names = F)
+    }
+  )
+  
+  # Export tab download handling ----
+  # UI
+  output$download_export_btn = renderUI({
+    if(!is.null(input$key_selection_reporting) & !is.null(input$file_upload_reporting)) {
+      downloadButton('download_table_export', 'Download')
+    }
+  })
+  
+  # Handler
+  output$download_table_export = downloadHandler(
+    filename = function() {
+      paste0("export_", format(Sys.Date(), "%Y%m%d"),".csv")
+    },
+    content = function(file) {
+      write.csv(reformat_report(), file,row.names = F)
+    }
   )
 }
