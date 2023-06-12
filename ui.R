@@ -1,67 +1,78 @@
 ###############################################
 # Shiny App UI for FW Test Results Reformatting
-# Hasan Sulaeman, 10/05/2020
+# Hasan Sulaeman, v2.0;05/15/2023
 ###############################################
 
-library(shinythemes)
+# Dependencies ----
+library(shinyWidgets)
 library(shinydashboard)
-
-# Dashboard Header ----
-dashboard_header = dashboardHeader(title = "VRI ROC")
-
-# Dashboard Sidebar ----
-dashboard_sidebar = dashboardSidebar(
-  sidebarMenu(
-    menuItem("QC Received Samples", tabName = "dashboard", icon = icon("fas fa trucks")),
-    menuItem("Reformat Test Results", icon = icon("th"), tabName = "widgets",
-             badgeLabel = "new", badgeColor = "green")
-  )
-)
-
-# Dashboard Body ----
-dashboard_body = dashboardBody()
-
-# Dashboard Page ----
-dashboardPage(dashboard_header, dashboard_sidebar, dashboard_body, skin = "black")
+library(shinydashboardPlus)
 
 # UI ----
-ui = fluidPage(
+theme = "www:/bootstrap_lux.css"
+shinyjs::useShinyjs()
 
-  titlePanel("Reformatting Test Results for Freezerworks Import"),
-  theme = shinytheme("cosmo"),
-  tags$h4("v1.0; 10/12/2020"),
-  sidebarLayout(
-    sidebarPanel(
-      tags$h3("Instructions:"),
-      tags$body("~TESTING~"),
-      tags$hr(),
-      textOutput("instructions", container = div, inline = FALSE),
-      textAreaInput("test_name", "Test Name:", rows = 1,
-                    placeholder = "Vitros CoV2T"),      
-      tags$hr(),      
-      fileInput("manifest", "Testing Manifest",
-                multiple = FALSE,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
-      selectInput("manifest_sampleid", "Sample ID Field:", "", multiple = F),
-      tags$hr(),
-      fileInput("results", "Testing Results",
-                multiple = FALSE,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
-      selectInput("results_sampleid","Sample ID Field:","", multiple = F),
-      selectInput("results_quant","Quantitative Results Field:","", multiple = F),
-      selectInput("results_qual","Qualitative Results Field:","", multiple = F),
-      tags$hr(),
-      textAreaInput("quant_paramname", "Quantitative Parameter Name in Freezerworks:", rows = 1,
-                    placeholder = "Vitros CoV2T S/CO"),
-      textAreaInput("qual_paramname", "Qualitative Parameter Name in Freezerworks:", rows = 1,
-                    placeholder = "Vitros CoV2T Interpretation"),
-      downloadButton("downloadData", "Download")),
-    mainPanel(
-      tableOutput("contents")
+# Dashboard Build ----
+header = dashboardHeader()
+
+# Sidebar
+sidebar = dashboardSidebar(
+  sidebarMenu(
+  menuItem("Import Reformatting", tabName = "import", icon = icon("import", lib = "glyphicon")),
+  menuItem("Export Reformatting", tabName = "export", icon = icon("export", lib = "glyphicon")),
+  width = 3
+  ),
+  collapsed = T
+)
+
+# Body
+body = dashboardBody(
+  tabItems(
+    # Import reformatting page ----
+    tabItem(tabName = "import",
+            fluidRow(
+              box(
+                title = "Import File Reformatting",
+                # Test name
+                selectInput("test_name", "Test Name", choices = ""),
+                # File upload
+                fileInput("file_upload", "File Upload", multiple = F, accept = ".csv"),
+                # Download button
+                uiOutput("download_import_btn"),
+                # Other arguments
+                width = 3
+              ),
+              column(
+                # Table output for user review if successful
+                tableOutput("contents_import"), width = 9
+              )
+            )
+    ),
+    # Export reformatting page ----
+    tabItem(tabName = "export",
+            fluidRow(
+              box(
+                title = "Export File Reformatting",
+                # Select an identifier
+                selectInput("key_selection_reporting", "Identifier", 
+                            choices = c("Freezerworks ID", "Unique Aliquot ID"), 
+                            selected = NULL),
+                # Upload the file
+                fileInput("file_upload_reporting", "File Upload", multiple = F, accept = ".csv"),
+                # Download button
+                uiOutput("download_export_btn"),
+                # Other arguments
+                width = 3
+              ),
+              column(
+                # Table output for user review if successful
+                tableOutput("contents_reporting"),
+                width = 9
+              )
+            ),
     )
   )
 )
+
+# Build the dashboard page ----
+dashboardPage(header, sidebar, body)
