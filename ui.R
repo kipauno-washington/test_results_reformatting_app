@@ -2,6 +2,7 @@
 # Shiny App UI for FW Test Results Reformatting
 # Hasan Sulaeman, v2.0;05/15/2023
 ###############################################
+
 # Dependencies ----
 library(shinyWidgets)
 library(shinydashboard)
@@ -41,7 +42,7 @@ body = dashboardBody(
                 # Other arguments
                 width = 3
               ),
-              column(              
+              column(
                 # Table output for user review if successful
                 tableOutput("contents_import"), width = 9
               )

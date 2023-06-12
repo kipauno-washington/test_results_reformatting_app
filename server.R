@@ -1,6 +1,6 @@
 ###################################################
 # Shiny App Server for FW Test Results Reformatting
-# Hasan Sulaeman, 10/05/2020
+# Hasan Sulaeman, v2.1; 06/06/2023
 ###################################################
 
 # Single upload only. No limitation for if the headers are not on the first row
@@ -16,7 +16,7 @@ server = function(input, output, session) {
   require(glue)
   require(shinythemes)
   
-  # Loading the static variables ----
+  # Load References ----
   cat("\nInitializing Freezerworks Reformatting Web App..", fill = T)
   ref = read_yaml("www:/reference.yaml")
   cat("> Reference file was successfully loaded in", fill = T)
@@ -35,10 +35,11 @@ server = function(input, output, session) {
     # Pulling in variables from reference file ----
     if (input$test_name != "test_names") {
       cat(glue("\n\nTest name selected: {input$test_name}\n\n"), fill = T)
-      quant_vars = ref[[input$test_name]][["quantitative"]]
-      qual_vars = names(ref[[input$test_name]][["qualitative"]])
+      test_ref = ref[[input$test_name]]
+      quant_vars = test_ref[["quantitative"]]
+      qual_vars = names(test_ref[["qualitative"]])
       if (!is.null(qual_vars)) {
-        qual_vars_list = ref[[input$test_name]][["qualitative"]]
+        qual_vars_list = test_ref[["qualitative"]]
       }
     }
     
@@ -67,8 +68,8 @@ server = function(input, output, session) {
     # Saving the final field names for validation
     fnames = names(uploaded_file)
 
-    # Perform validation ----
-    #  Identifier
+    # Validation ----
+    #  Identifier ----
     cat("> Validating identifier field..", fill = T)
     validate(
       need(identifier %in% fnames, "Unique Test Order ID not found in the file")
@@ -79,18 +80,19 @@ server = function(input, output, session) {
     uploaded_file[,identifier][identifier == ""] = NA
     uploaded_file = subset(uploaded_file, !is.na(uploaded_file[,identifier]))
     
-    #  Quantitative variable(s)
+    #  Quantitative variable(s) ----
     if (!is.null(quant_vars)) {
       cat("> Validating quantitative variables..", fill = T)
       validate(
         need(all(quant_vars %in% fnames), 
              glue("Missing quantitative variable field: {quant_vars[quant_vars %in% fnames == F]}"))
       )
-      for (variable in quant_vars)
-      class(uploaded_file[,variable]) = "numeric"
+      for (variable in quant_vars) {
+        class(uploaded_file[,variable]) = "numeric"
+      }
     }
     
-    #  Qualitative variable(s)
+    #  Qualitative variable(s) ----
     if (!is.null(qual_vars)) {
       cat("> Validating qualitative variable names..", fill = T)
       validate(
@@ -119,11 +121,68 @@ server = function(input, output, session) {
       }
     }
     
-    # Pull the required fields from the file ----
+    #  Admin-set validation, if applicable ----
+    if ("validation" %in% names(test_ref)) {
+      extra_qc = test_ref[["validation"]]
+      
+      # Look for set quantitative variable check(s) ----
+      if ("quant_check" %in% names(extra_qc)) {
+        quant_qc = extra_qc[["quant_check"]]
+        quant_params = names(quant_qc)
+        validate(
+          need(all(quant_params %in% quant_vars),
+               message = glue("Validation setting error: {quant_params} is not recognized for the asssay"))
+        )
+        # Go through each quantitative parameter
+        for (param in quant_params) {
+          # Pull the qc setting(s) for the parameter
+          qc_ck = quant_qc[[param]]
+          # Check for minimum value setting
+          if ("min" %in% names(qc_ck)) {
+            validate(all(as.numeric(uploaded_file[,param]) <= as.numeric(qc_ck[["min"]])),
+                     message = glue("{uploaded_file[,param]} is below the set minimum value for {param}"))
+          }
+          # Check for maximum value setting
+          if ("max" %in% names(qc_ck)) {
+            validate(all(as.numeric(uploaded_file[,param]) >= as.numeric(qc_ck[["max"]])),
+                     message = glue("{uploaded_file[,param]} is above the set maximum value for {param}"))
+          }
+        }
+      }
+      
+      # Look for set qualitative variable check(s) ----
+      if ("qual_check" %in% names(extra_qc)) {
+        qual_qc = extra_qc[["quant_check"]]
+        qual_params = names(qual_qc)
+        validate(
+          need(all(qual_params %in% qual_vars),
+               message = glue("Validation setting error: {qual_params} is not recognized for the assay"))
+        )
+        # Go through each qualitative parameter
+        for (param in qual_params) {
+          # Pull the qc setting(s) for the parameter
+          qc_ck = qual_qc[[param]]
+          cvalue = c("cutoff","value","quant_parameter")
+          validate(
+            need(all(cvalue %in% names(qc_ck)),
+                 message = glue("Validation setting error: {param} is missing {cvalue[cvalue %in% names(qc_ck) == F]}"))
+          )
+          check_quant = qc_ck[["quant_parameter"]]
+          check_value = qc_ck[["value"]]
+          check_cutoff = qc_ck[["cutoff"]]
+          validate(
+            need(all(record[,quant_parameter][record[,param] == check_value] >= check_cutoff),
+                 message = "Found mismatching quant and qual values")
+          )
+        }
+      }
+    }
+    # Reformatting ----
+    #  Pull all required fields ----
     results = uploaded_file %>% 
       select(all_of(required_fields))
     
-    # Reformatting qualitative parameters ----
+    #  Qualitative variable(s) ----
     cat("> Validation complete\n\nInitiating reformatting:", fill = T)
     if (!is.null(qual_vars)) {
       cat("> Reformatting qualitative variables..", fill = T)
@@ -135,7 +194,7 @@ server = function(input, output, session) {
         select(all_of(export_fnames))
     }
     
-    # Reformatting quantitative parameters ----
+    #  Quantitative variable(s) ----
     if (!is.null(quant_vars)) {
       cat("> Reformatting quantitative variables..", fill = T)
       quant_results = results %>%
@@ -147,13 +206,13 @@ server = function(input, output, session) {
         select(all_of(export_fnames))
     }
     
-    # Returning bound and reformatted data frame ----
+    #  Returning bound and reformatted data frame ----
     bound = rbind(qual_results, quant_results) %>% arrange(`Unique Test Order ID`)
     import_file = as.data.frame(bound)
     cat("> Reformatting complete\n", fill = T)
     return(import_file)
   })
-  
+
   # Export file reformatting ----
   reformat_report = reactive({
     # Inputs required ----
@@ -170,7 +229,7 @@ server = function(input, output, session) {
     fw_export_fnames = names(fw_export)
     validate(
       need(all(req_fnames_rep %in% names(fw_export)),
-           glue("Missing required field: {fw_export_fnames[fw_export_fnames %in% req_fnames_rep == F]}"))
+           glue("Missing required field: {req_fnames_rep[req_fnames_rep %in% fw_export_fnames  == F]}"))
     )
     
     # Reformat the export ----
