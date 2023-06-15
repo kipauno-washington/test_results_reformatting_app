@@ -1,0 +1,35 @@
+
+qual_entries = excel %>%
+  select(test_name = TESTNAME, 
+         inactive = INACTIVE, 
+         parameter_name = PARAMETERNAME, 
+         enum = QUALRESULT) %>%
+  filter(test_name %in% ref_table$test_name & inactive == 0)
+
+ref2 = vector(mode = "list", length = length(test_names))
+names(ref2) = test_names
+for (i in 1:length(ref2)) {
+  # Make quantitative and qualitative lists
+  ref2[[i]] = vector(mode = "list", length = 2)
+  names(ref2[[i]]) = c("quantitative", "qualitative")
+  # Handle the quant variables
+  quantfs = ref_table$parameter[ref_table$test_name == names(ref2[i]) & ref_table$qualitative == 0]
+  ref2[[i]]["quantitative"] = list(quantfs)
+  # Handle the qual variables
+  qualfs = ref_table$parameter[ref_table$test_name == names(ref2[i]) & ref_table$qualitative == 1]
+  if (length(qualfs) > 0) {
+    ref2[[i]][["qualitative"]] = vector(mode = "list", length = length(qualfs))
+    names(ref2[[i]][["qualitative"]]) = qualfs
+    for (j in 1:length(qualfs)) {
+      enums = unique(qual_entries$enum[qual_entries$parameter_name == qualfs[j]])
+      if (length(enums) > 0) {
+        ref2[[i]][["qualitative"]][[j]] = vector(mode = "list", length = length(enums))
+        ref2[[i]][["qualitative"]][[j]] = enums
+      } else {
+        ref2[[i]][["qualitative"]][[j]] = NULL
+      }
+    }
+  }
+}
+
+yaml::write_yaml(ref2, file = "~/Desktop/reference_test.yaml")
