@@ -2,12 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-<<<<<<< HEAD
 *.Rproj
 rsconnect/
-.DS_Store
-=======
 *.DS_Store
 *.Rproj
-rsconnect
->>>>>>> v2
