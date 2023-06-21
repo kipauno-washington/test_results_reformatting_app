@@ -9,12 +9,8 @@
 
 server = function(input, output, session) {
   # Required packages ----
-  require(dplyr)
-  require(tidyr)
-  require(DT)
-  require(yaml)
-  require(glue)
-  require(shinythemes)
+  require(librarian)
+  librarian::shelf(dplyr, tidyr, DT, yaml, glue, shinythemes)
   
   # Load References ----
   cat("\nInitializing Freezerworks Reformatting Web App..", fill = T)
@@ -24,7 +20,8 @@ server = function(input, output, session) {
   updateSelectInput(session = session, "test_name", choices = names(ref), selected = "")
   cat("> Web app ready", fill = T)
   identifier = "Unique Test Order ID"
-  export_fnames = c(identifier, "Test Name", "Parameter Name", "Qualitative Result", "Quantitative Result")
+  export_fnames = c(identifier, "Test Name", "Parameter Name", 
+                    "Qualitative Result", "Quantitative Result")
   
   # Import file reformatting ----
   fw_import_file = reactive({

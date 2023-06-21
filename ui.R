@@ -4,9 +4,8 @@
 ###############################################
 
 # Dependencies ----
-library(shinyWidgets)
-library(shinydashboard)
-library(shinydashboardPlus)
+require(librarian)
+librarian::shelf(shinyWidgets, shinydashboard, shinydashboardPlus)
 
 # UI ----
 theme = "www:/bootstrap_lux.css"

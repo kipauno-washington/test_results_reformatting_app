@@ -1,6 +1,6 @@
 # Shiny-based Test Result Reformatting App
 
-### Designed to complement the implementation of Freezerworks' testing module
+## Designed to complement the implementation of Freezerworks' testing module
 
 [Freezerworks](https://freezerworks.com) is a Laboratory Information Management System (LIMS) designed by Dataworks Development Inc. and is a great tool for managing bioarchives which involves sample storage in (often times) many freezers.
 
@@ -10,8 +10,22 @@ The aim for this Shiny-based web app is to invalidate the skill floor required t
 
 To reformat an import file, all the user will have to do is upload the .csv file containing test results and choose the assay from a list specified in the reference file. To reformat an export, simply upload the export and specify which Freezerworks-specific aliquot or sample-level identifier to use.
 
+<div>
+
 #### Installation
 
 1.  Clone this repository
-2.  Build the reference file using either the [reference builder](./reference_builder.R) script and an export from your Freezerworks instance or by simply editing the reference file to suit your needs
-3.  Deploy!
+2.  Install the required packages by running the code below in R and installing the librarian package. The librarian package will downloaded and load other required packages as the scripts run.\
+    [`install.packages(librarian)`]{.underline}
+3.  Build the reference file using either the [reference builder](./reference_builder.R) script and exported tables from your Freezerworks instance or by simply editing the reference file to suit your needs
+4.  Deploy!
+
+</div>
+
+## Reference File
+
+The reference file must be labelled as reference.yaml and is in the www/: subdirectory of the app for the web application to function. The file informs the web app on acceptable test names, the variables for those tests, and acceptable values for qualitative variables (if configured) and so it cannot be omitted.
+
+To generate a reference.yaml file from scratch, the reference builder script included in the repository could be used. Source reference_builder.R in either R or RStudio and you'll be able to select the reference tables and export a reference.yaml file. Users can also write the .yaml file from scratch or modify a pre-existing one, as long as the reference.yaml file is correctly formatted and is in the correct subdirectory.
+
+It's important to note that the reference builder uses two internal tables exported from the Freezerworks testing module. To access these tables, users would need to have access to the database backend. Contact Freezerworks support if you don't know how to extract the two tables required: parameter and test names table as well as the enumerator table for qualitative parameters.
