@@ -4,14 +4,14 @@
 ###############################################
 
 # Dependencies ----
-require(librarian)
-librarian::shelf(shinyWidgets, shinydashboard, shinydashboardPlus)
+require(shinyWidgets)
+require(shinydashboard)
+require(shinydashboardPlus)
 
 # UI ----
 theme = "www:/bootstrap_lux.css"
-shinyjs::useShinyjs()
 
-# Dashboard Build ----
+# Dashboard ----
 header = dashboardHeader()
 
 # Sidebar

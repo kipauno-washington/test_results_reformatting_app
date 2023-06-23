@@ -9,8 +9,12 @@
 
 server = function(input, output, session) {
   # Required packages ----
-  require(librarian)
-  librarian::shelf(dplyr, tidyr, DT, yaml, glue, shinythemes)
+  require(dplyr)
+  require(tidyr)
+  require(DT)
+  require(yaml)
+  require(glue)
+  require(shinythemes)
   
   # Load References ----
   cat("\nInitializing Freezerworks Reformatting Web App..", fill = T)
