@@ -192,10 +192,9 @@ server = function(input, output, session) {
                      values_to = "Qualitative Result") %>%
         mutate(`Test Name` = input$test_name,
                `Quantitative Result` = "") %>%
-        select(all_of(export_fnames))
+        select(`Unique Test Order ID`, `Test Name`, `Parameter Name`, 
+               `Qualitative Result`, `Quantitative Result`)
     }
-    # Trim whitespaces
-    qual_results$`Qualitative Result` = trimws(qual_results$`Qualitative Result`)
     
     #  Quantitative variable(s) ----
     if (!is.null(quant_vars)) {
@@ -206,7 +205,8 @@ server = function(input, output, session) {
         mutate(`Test Name` = input$test_name,
                `Qualitative Result` = "") %>%
         filter(!is.na(`Quantitative Result`)) %>%
-        select(all_of(export_fnames))
+        select(`Unique Test Order ID`, `Test Name`, `Parameter Name`, 
+               `Qualitative Result`, `Quantitative Result`)
     }
     
     #  Bind the variables together ----
@@ -219,11 +219,16 @@ server = function(input, output, session) {
       if (is.null(quant_vars)) {
         bound = qual_results %>% arrange(`Unique Test Order ID`)
       }
-    } 
+    }
     
     # Filter out blanks ----
-    import_file = as.data.frame(bound) %>%
-      filter(`Qualitative Result` != "" & `Quantitative Result` != "")
+    bound$pk = seq(1, nrow(bound))
+    blanks = bound %>%
+      filter(`Qualitative Result` == "" & `Quantitative Result` == "")
+    bound = bound %>%
+      filter(pk %in% blanks$pk == F) %>%
+      select(-pk)
+    import_file = as.data.frame(bound)
     cat("> Reformatting complete\n", fill = T)
     return(import_file)
   })
