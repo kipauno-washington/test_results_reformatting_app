@@ -147,3 +147,19 @@ HCV Sequencing:
   qualitative:
     HCV Subtype: [HCV Subtype 1a, HCV Subtype 1b]
     Successful Sequence: ['NO', 'YES']
+
+RBC IMPACT CHEMISTRY PANEL:
+  quantitative:
+   - Ferritin (ng/mL)
+   - Ferritin Dilution Factor of Final Result
+   - Serum Fe (ug/dL)
+   - Serum Fe Dilution Factor of Final Result
+   - Bilirubin, Total (mg/dL)
+   - Bilirubin, Unconjugated (mg/dL)
+   - Bilirubin, Conjugated (mg/dL)
+   - Total Iron Binding Capacity (ug/dL)
+   - TIBC Dilution Factor of Final Result
+  qualitative:
+    Test Date:
+    Ferritin Flag: ['>','<','']
+    Bilirubin, Total Flag: ['>','<','']

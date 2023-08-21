@@ -194,6 +194,8 @@ server = function(input, output, session) {
                `Quantitative Result` = "") %>%
         select(all_of(export_fnames))
     }
+    # Trim whitespaces
+    qual_results$`Qualitative Result` = trimws(qual_results$`Qualitative Result`)
     
     #  Quantitative variable(s) ----
     if (!is.null(quant_vars)) {
@@ -207,9 +209,21 @@ server = function(input, output, session) {
         select(all_of(export_fnames))
     }
     
-    #  Returning bound and reformatted data frame ----
-    bound = rbind(qual_results, quant_results) %>% arrange(`Unique Test Order ID`)
-    import_file = as.data.frame(bound)
+    #  Bind the variables together ----
+    if (!is.null(quant_vars) & !is.null(qual_vars)) {
+      bound = rbind(qual_results, quant_results) %>% arrange(`Unique Test Order ID`)
+    } else {
+      if (is.null(qual_vars)) {
+        bound = quant_results %>% arrange(`Unique Test Order ID`)
+      }
+      if (is.null(quant_vars)) {
+        bound = qual_results %>% arrange(`Unique Test Order ID`)
+      }
+    } 
+    
+    # Filter out blanks ----
+    import_file = as.data.frame(bound) %>%
+      filter(`Qualitative Result` != "" & `Quantitative Result` != "")
     cat("> Reformatting complete\n", fill = T)
     return(import_file)
   })
