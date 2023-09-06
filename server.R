@@ -242,7 +242,7 @@ server = function(input, output, session) {
     # Static field name requirements ----
     reporting_id = input$key_selection_reporting
     req_fnames_rep = c(reporting_id, "Parameter Name", 
-                       "Qualitative Result", "Quantitative Result")
+                       "Quantitative Result", "Qualitative Result")
     
     # Validation of uploaded file ----
     fw_export = read.csv(input$file_upload_reporting$datapath, check.names = F)
@@ -274,6 +274,7 @@ server = function(input, output, session) {
     #  Join the two tables by the selected identifier
     joined = full_join(export_quant, export_qual, by = reporting_id)
     
+    
     # Return the reformatted file ----
     export_file = as.data.frame(joined)
     return(export_file)
@@ -297,7 +298,7 @@ server = function(input, output, session) {
       paste0(tolower(gsub(" ","_",input$test_name)),"_",format(Sys.Date(), "%Y%m%d"),".csv")
     },
     content = function(file) {
-      write.csv(fw_import_file(), file,row.names = F)
+      write.csv(fw_import_file(), file, row.names = F, na = "")
     }
   )
   
@@ -315,7 +316,7 @@ server = function(input, output, session) {
       paste0("export_", format(Sys.Date(), "%Y%m%d"),".csv")
     },
     content = function(file) {
-      write.csv(reformat_report(), file,row.names = F)
+      write.csv(reformat_report(), file, row.names = F, na = "")
     }
   )
 }
