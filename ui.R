@@ -53,8 +53,8 @@ body = dashboardBody(
               box(
                 title = "Export File Reformatting",
                 # Select an identifier
-                selectInput("key_selection_reporting", "Identifier", 
-                            choices = c("Freezerworks ID", "Unique Aliquot ID"), 
+                selectInput("key_selection_reporting", "Identifier",
+                            choices = c("Freezerworks ID", "Unique Aliquot ID"),
                             selected = NULL),
                 # Upload the file
                 fileInput("file_upload_reporting", "File Upload", multiple = F, accept = ".csv"),

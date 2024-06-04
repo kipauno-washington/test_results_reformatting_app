@@ -1,14 +1,14 @@
 # Reference table for the Freezerworks Results Reformating Web App
-# 
+#
 #
 # Instructions:
-#  1. Follow the format and syntax of the assay name along with the quantitative and qualitative categories on separate lines. 
+#  1. Follow the format and syntax of the assay name along with the quantitative and qualitative categories on separate lines.
 #     Pay close attention to indenting as it affects how the file would be read by the web app.
-#  2. Quantitative parameter names go on the same line as the quantitative subpoint, within square brackets and separated by a (,). 
+#  2. Quantitative parameter names go on the same line as the quantitative subpoint, within square brackets and separated by a (,).
 #  3. Qualitative parameter names are written under the qualitative subpoint, indented, and ends with ( : ).
 #     a. If enumerators are defined for a qualitative parameter, all acceptable entries should be put within square brackets
-#        on the same line as the parameter name. 
-#     b. If no enumerators are defined for a qualitative parameter (e.g., dates, freehand notes, etc) end the parameter name 
+#        on the same line as the parameter name.
+#     b. If no enumerators are defined for a qualitative parameter (e.g., dates, freehand notes, etc) end the parameter name
 #        with ( : ) still but keep it blank.
 #
 # Notes:
@@ -100,7 +100,7 @@ Coulter Component Count:
   qualitative:
 
 Sequencing:
-  quantitative: 
+  quantitative:
   qualitative:
     Sequencing Interpretation: [Successful, Not successful]
 
@@ -143,7 +143,7 @@ HBV Sequencing:
     Sucessful Sequence: ['YES', 'NO']
 
 HCV Sequencing:
-  quantitative: 
+  quantitative:
   qualitative:
     HCV Subtype: [HCV Subtype 1a, HCV Subtype 1b]
     Successful Sequence: ['NO', 'YES']
@@ -163,3 +163,42 @@ RBC IMPACT CHEMISTRY PANEL:
     Test Date:
     Ferritin Flag: ['>','<','']
     Bilirubin, Total Flag: ['>','<','']
+  add_date: yes
+
+RBC IMPACT MDA:
+  quantitative: MDA (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT PFHb:
+  quantitative: PFHb (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT HEPCIDIN:
+  quantitative: Hepcidin (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT CYTOKINE PANEL:
+  quantitative:
+  - IL6 (pg/mL)
+  - INFg (pg/mL)
+  - MCP-1 (pg/mL)
+  qualitative:
+  add_date: yes
+
+LAg Abbreviated:
+  quantitative:
+  - LAg Initial ODn
+  - LAg Confirm ODn
+  - LAg Final ODn
+  qualitative:
+    LAg Initial Interpretation: ['CONFIRM','LT']
+    LAg Final Classification: ['LT','RECENT','SEROLOGY NEGATIVE']
+
+Ortho VITROS HIV Combo:
+  quantitative:
+  - Ortho VITROS HIV Combo S/CO
+  qualitative:
+    Ortho VITROS HIV Combo Interpretation: ['Reactive','Non-Reactive','Invalid','QNS']
