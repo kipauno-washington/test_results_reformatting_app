@@ -77,18 +77,21 @@ Aptima HIV TMA Viral Load:
   qualitative:
     HIV Viral Load Interpretation: [Invalid, Not detected, Detected, '>10,000,000', <30 detected, Reactive, Non-Reactive]
     Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
 
 Aptima HCV TMA Viral Load:
   quantitative: HCV Viral Load
   qualitative:
     HCV Viral Load Interpretation: [Not detected, Invalid, Detected, '>100,000,000', <10 detected]
     Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
 
 Aptima HBV TMA Viral Load:
   quantitative: HBV Viral Load
   qualitative:
     HBV Viral Load Interpretation: [<10  detected, '>1,000,000,000', Detected, Not detected, Invalid, Non-Reactive, Reactive]
     Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
 
 Vitros CoV2 N tot Ig:
   quantitative: Vitros CoV2 N tot Ig S/CO

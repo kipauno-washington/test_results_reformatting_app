@@ -297,18 +297,48 @@ server = function(input, output, session) {
     req(input$key_selection_reporting)
     req(input$file_upload_reporting)
 
-    # Static field name requirements ----
+    # Static requirements ----
+    # Fieldnames in the export file
     reporting_id = input$key_selection_reporting
-    req_fnames_rep = c(reporting_id, "Test Date", "Parameter Name",
+    req_fnames_rep = c("Test Name", reporting_id, "Test Date", "Parameter Name",
                        "Quantitative Result", "Qualitative Result")
 
     # Validation of uploaded file ----
     fw_export = read.csv(input$file_upload_reporting$datapath, check.names = F)
     fw_export_fnames = names(fw_export)
+
+    # Check if all the fields are there
     validate(
       need(all(req_fnames_rep %in% names(fw_export)),
            glue("Missing required field: {req_fnames_rep[req_fnames_rep %in% fw_export_fnames  == F]}"))
     )
+
+    # Check if the assay name is in the config file
+    export_assay_name = unique(fw_export$`Test Name`)
+    validate(
+      need(length(export_assay_name) == 1,
+           glue("More than one assay name included in the uploaded file: {cat(export_assay_name, sep = ', ')}"))
+    )
+    # Check test name in config file
+    validate(
+      need(export_assay_name %in% names(ref),
+           glue("{export_assay_name} is not a valid assay. Check with an administator."))
+    )
+
+    # Set up the config file
+    test_ref_export = ref[[export_assay_name]]
+    vars_export = append(test_ref_export[["quantitative"]], names(test_ref_export[["qualitative"]]))
+    add_date_export = test_ref_export[["add_date"]]
+    # Check for whether add_date is logical
+    validate(
+      need(class(add_date_export) == "logical",
+           "Test date configuration error. Check with an administrator.")
+    )
+    # Set export field names for if test date is supposed to be added
+    if (add_date_export == T) {
+      req_fnames_rep = c("Test Name", reporting_id, "Test Date", "Parameter Name",
+                         "Quantitative Result", "Qualitative Result")
+    }
 
     # Reformat the export ----
     #  Quantitative variables
@@ -330,11 +360,20 @@ server = function(input, output, session) {
                   values_from = `Qualitative Result`)
 
     #  Join the two tables by the selected identifier
-    joined = full_join(export_quant, export_qual, by = reporting_id)
+    joined = as.data.frame(full_join(export_quant, export_qual, by = reporting_id))
 
+    # Check if all of the field names are present
+    full_vars_export = append(reporting_id, vars_export)
+    if (!all(full_vars_export %in% names(joined))) {
+      missing_fields_export = full_vars_export[full_vars_export %in% names(joined) == F]
+      for (i in 1:length(missing_fields_export)) {
+        joined[,missing_fields_export[i]] = NA
+      }
+    }
+    export_df = select(joined, full_vars_export)
 
     # Return the reformatted file ----
-    export_file = as.data.frame(joined)
+    export_file = export_df
     return(export_file)
   })
 
