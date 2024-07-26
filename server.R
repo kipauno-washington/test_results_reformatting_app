@@ -249,8 +249,8 @@ server = function(input, output, session) {
                        names_to = "Parameter Name",
                        values_to = "Quantitative Result") %>%
           mutate(`Test Name` = input$test_name,
-                 `Qualitative Result` = "") %>%
-          filter(!is.na(`Quantitative Result`)) %>%
+                 `Qualitative Result` = "",
+                 `Quantitative Result` = replace_na("")) %>%
           select(`Unique Test Order ID`, `Test Name`, `Test Date`, `Parameter Name`,
                  `Qualitative Result`, `Quantitative Result`)
       } else {
@@ -260,8 +260,8 @@ server = function(input, output, session) {
                        names_to = "Parameter Name",
                        values_to = "Quantitative Result") %>%
           mutate(`Test Name` = input$test_name,
-                 `Qualitative Result` = "") %>%
-          filter(!is.na(`Quantitative Result`)) %>%
+                 `Qualitative Result` = "",
+                 `Quantitative Result` = replace_na("")) %>%
           select(`Unique Test Order ID`, `Test Name`, `Parameter Name`,
                  `Qualitative Result`, `Quantitative Result`)
       }
@@ -279,13 +279,7 @@ server = function(input, output, session) {
       }
     }
 
-    # Filter out blanks ----
-    bound$pk = seq(1, nrow(bound))
-    blanks = bound %>%
-      filter(`Qualitative Result` == "" & `Quantitative Result` == "")
-    bound = bound %>%
-      filter(pk %in% blanks$pk == F) %>%
-      select(-pk)
+    # Return the file ----
     import_file = as.data.frame(bound)
     cat("> Reformatting complete\n", fill = T)
     return(import_file)
@@ -376,7 +370,6 @@ server = function(input, output, session) {
     export_file = export_df
     return(export_file)
   })
-
   # Table renderings ----
   output$contents_import = renderTable(fw_import_file())
   output$contents_reporting = renderTable(reformat_report())
