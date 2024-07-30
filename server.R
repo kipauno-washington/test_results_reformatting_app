@@ -233,8 +233,7 @@ server = function(input, output, session) {
         qual_results = results %>%
           pivot_longer(cols = qual_vars, names_to = "Parameter Name",
                        values_to = "Qualitative Result") %>%
-          mutate(`Test Name` = input$test_name,
-                 `Quantitative Result` = "") %>%
+          mutate(`Test Name` = input$test_name) %>%
           select(`Unique Test Order ID`, `Test Name`, `Parameter Name`,
                  `Qualitative Result`, `Quantitative Result`)
       }
@@ -249,8 +248,7 @@ server = function(input, output, session) {
                        names_to = "Parameter Name",
                        values_to = "Quantitative Result") %>%
           mutate(`Test Name` = input$test_name,
-                 `Qualitative Result` = "",
-                 `Quantitative Result` = replace_na("")) %>%
+                 `Qualitative Result` = "") %>%
           select(`Unique Test Order ID`, `Test Name`, `Test Date`, `Parameter Name`,
                  `Qualitative Result`, `Quantitative Result`)
       } else {
@@ -260,8 +258,7 @@ server = function(input, output, session) {
                        names_to = "Parameter Name",
                        values_to = "Quantitative Result") %>%
           mutate(`Test Name` = input$test_name,
-                 `Qualitative Result` = "",
-                 `Quantitative Result` = replace_na("")) %>%
+                 `Qualitative Result` = "") %>%
           select(`Unique Test Order ID`, `Test Name`, `Parameter Name`,
                  `Qualitative Result`, `Quantitative Result`)
       }
