@@ -15,6 +15,7 @@ server = function(input, output, session) {
   require(yaml)
   require(glue)
   require(shinythemes)
+  require(varhandle)
 
   # Load References ----
   cat("\nInitializing Freezerworks Reformatting Web App..", fill = T)
@@ -104,6 +105,10 @@ server = function(input, output, session) {
              glue("Missing quantitative variable field: {quant_vars[quant_vars %in% fnames == F]}"))
       )
       for (variable in quant_vars) {
+        validate(
+          need(all(check.numeric(variable)),
+               glue("Quantitative variable cannot be fully converted into numeric"))
+        )
         class(uploaded_file[,variable]) = "numeric"
       }
     }
@@ -336,7 +341,7 @@ server = function(input, output, session) {
     quant_fnames = req_fnames_rep[req_fnames_rep != "Qualitative Result"]
     export_quant = fw_export %>%
       select(all_of(quant_fnames)) %>%
-      filter(!is.na(`Quantitative Result`) & `Quantitative Result` != "") %>%
+      filter(!is.na(`Quantitative Result`)) %>%
       pivot_wider(id_cols = reporting_id,
                   names_from = `Parameter Name`,
                   values_from = `Quantitative Result`)
@@ -345,7 +350,7 @@ server = function(input, output, session) {
     qual_fnames = req_fnames_rep[req_fnames_rep != "Quantitative Result"]
     export_qual = fw_export %>%
       select(all_of(qual_fnames)) %>%
-      filter(!is.na(`Qualitative Result`) & `Qualitative Result` != "") %>%
+      filter(!is.na(`Qualitative Result`)) %>%
       pivot_wider(id_cols = reporting_id,
                   names_from = `Parameter Name`,
                   values_from = `Qualitative Result`)
