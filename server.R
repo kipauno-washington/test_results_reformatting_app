@@ -38,10 +38,10 @@ server = function(input, output, session) {
     if (input$test_name != "test_names") {
       cat(glue("\n\nTest name selected: {input$test_name}\n\n"), fill = T)
       test_ref = ref[[input$test_name]]
-      quant_vars = test_ref[["quantitative"]]
+      quant_vars = names(test_ref[["quantitative"]])
       qual_vars = names(test_ref[["qualitative"]])
       if (!is.null(qual_vars)) {
-        qual_vars_list = test_ref[["qualitative"]]
+        qual_vars = test_ref[["qualitative"]]
       }
       add_date = test_ref[["add_date"]]
       # Check for whether add_date is logical
@@ -104,12 +104,22 @@ server = function(input, output, session) {
         need(all(quant_vars %in% fnames),
              glue("Missing quantitative variable field: {quant_vars[quant_vars %in% fnames == F]}"))
       )
-      for (variable in quant_vars) {
-        validate(
-          need(all(check.numeric(variable)),
-               glue("Quantitative variable cannot be fully converted into numeric"))
-        )
-        class(uploaded_file[,variable]) = "numeric"
+      # Checking for data type
+      for(variable in quant_vars) {
+        # Trimming whitespace(s) in the qualitative variable
+        uploaded_file[variable] = trimws(uploaded_file[,variable], which = "both")
+        cat("> Validating data type", fill = T)
+        quant_data_type = quant_vars[[variable]]
+        if (is.null(quant_data_type)) {
+          # Default to numeric
+          quant_data_type = "numeric"
+        }
+        if (quant_data_type == "numeric") {
+          validate(
+            need(all(check.numeric(uploaded_file[variable])),
+                 glue("Values for {variable} are incorrect"))
+          )
+        }
       }
     }
 
