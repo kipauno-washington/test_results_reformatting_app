@@ -41,7 +41,7 @@ server = function(input, output, session) {
       quant_vars = names(test_ref[["quantitative"]])
       qual_vars = names(test_ref[["qualitative"]])
       if (!is.null(qual_vars)) {
-        qual_vars = test_ref[["qualitative"]]
+        qual_vars_list = test_ref[["qualitative"]]
       }
       add_date = test_ref[["add_date"]]
       # Check for whether add_date is logical
@@ -109,7 +109,7 @@ server = function(input, output, session) {
         # Trimming whitespace(s) in the qualitative variable
         uploaded_file[variable] = trimws(uploaded_file[,variable], which = "both")
         cat("> Validating data type", fill = T)
-        quant_data_type = quant_vars[[variable]]
+        quant_data_type = test_ref[["quantitative"]][[variable]]
         if (is.null(quant_data_type)) {
           # Default to numeric
           quant_data_type = "numeric"

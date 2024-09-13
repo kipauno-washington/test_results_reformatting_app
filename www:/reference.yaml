@@ -193,12 +193,13 @@ RBC IMPACT CYTOKINE PANEL:
 
 LAg Abbreviated:
   quantitative:
-  - LAg Initial ODn
-  - LAg Confirm ODn
-  - LAg Final ODn
+    LAg Initial ODn: "character"
+    LAg Confirm ODn: "character"
+    LAg Final ODn: "character"
   qualitative:
     LAg Initial Interpretation: ['CONFIRM','LT']
     LAg Final Classification: ['LT','RECENT','SEROLOGY NEGATIVE']
+  add_date: yes
 
 Ortho VITROS HIV Combo:
   quantitative:
