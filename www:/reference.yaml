@@ -201,6 +201,28 @@ LAg Abbreviated:
     LAg Final Classification: ['LT','RECENT','SEROLOGY NEGATIVE']
   add_date: yes
 
+LAg TTIMS:
+  quantitative:
+    LAg Final ODn: "numeric"
+    LAg_initial_date: "character"
+    LAg_conf_date: "character"
+    LAg_init_ODn: "character"
+    LAg_init_OD: "character"
+    LAg_init_med_cal_od: "character"
+    LAg_conf_OD_1: "character"
+    LAg_conf_OD_2: "character"
+    LAg_conf_OD_3: "character"
+    LAg_conf_med_cal_od: "character"
+    LAg_conf_ODn_1: "character"
+    LAg_conf_ODn_2: "character"
+    LAg_conf_ODn_3: "character"
+    LAg_conf_ODn: "character"
+    LAg_Operator: "character"
+    LAg_kit: "character"
+  qualitative:
+    LAg Final Classification: ['LT', 'RECENT', 'SEROLOGY NEGATIVE']
+  add_date: yes
+
 Ortho VITROS HIV Combo:
   quantitative:
   - Ortho VITROS HIV Combo S/CO

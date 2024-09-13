@@ -116,7 +116,7 @@ server = function(input, output, session) {
         }
         if (quant_data_type == "numeric") {
           validate(
-            need(all(check.numeric(uploaded_file[variable])),
+            need(all(check.numeric(uploaded_file[[variable]])),
                  glue("Values for {variable} are incorrect"))
           )
         }
