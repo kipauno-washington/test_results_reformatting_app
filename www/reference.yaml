@@ -1,1 +1,231 @@
+# Reference table for the Freezerworks Results Reformating Web App
+#
+#
+# Instructions:
+#  1. Follow the format and syntax of the assay name along with the quantitative and qualitative categories on separate lines.
+#     Pay close attention to indenting as it affects how the file would be read by the web app.
+#  2. Quantitative parameter names go on the same line as the quantitative subpoint, within square brackets and separated by a (,).
+#  3. Qualitative parameter names are written under the qualitative subpoint, indented, and ends with ( : ).
+#     a. If enumerators are defined for a qualitative parameter, all acceptable entries should be put within square brackets
+#        on the same line as the parameter name.
+#     b. If no enumerators are defined for a qualitative parameter (e.g., dates, freehand notes, etc) end the parameter name
+#        with ( : ) still but keep it blank.
+#
+# Notes:
+#  - Members of a list (whatever's put in square brackets) don't need to be contained within single quotes ('')
+#    but some special characters might cause problems so it's likely a good idea to use them if you're unsure
+#  - You can edit this file using a text editor but editing in a coding software would be so much easier.
+#    Likelihood of formatting mistakes would also be less likely if editing with a coding software.
+
+Vitros CoV2 S tot Ig:
+  quantitative: Vitros CoV2 S tot Ig S/CO
+  qualitative:
+    Vitros CoV2 S tot Ig Interpretation: [Reactive, Non-reactive, QNS]
+
+RVP CoV Neutralization:
+  quantitative: [RVP Neut NT50, RVP Neut RLU, RVPN Percent NSC, RVPN Min Dilution, Test Date]
+  qualitative:
+    RVP Neut Interpretation: [Reactive, Non-reactive, QNS, Inconclusive]
+    Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+
+SARS-CoV-2 qPCR:
+  quantitative: [CoV2 qPCR Viral Load, CoV2 qPCR Ct]
+  qualitative:
+    CoV2 qPCR Result: [Non-reactive, Reactive]
+
+Vitros VIP HIV1/2:
+  quantitative: [Vitros VIP HIV1/2 SCO 1, Vitros VIP HIV1/2 SCO 2, Vitros VIP HIV1/2 SCO 3]
+  qualitative:
+    Vitros VIP HIV1/2 Interpretation: [Reactive, Non-reactive, QNS]
+
+Grifols CoV2 TMA Plus:
+  quantitative: [Grifols CoV2 TMA Plus S/CO, Grifols CoV2 TMA Plus S/CO 2]
+  qualitative:
+    Grifols CoV2 TMA Plus Interpretation: [Reactive, Non-reactive, QNS]
+    Grifols CoV2 TMA Plus Interpretation 2: [Reactive, Non-reactive, QNS]
+
+Tenofovir ELISA:
+  quantitative: Tenofovir ELISA Percent Inhibition
+  qualitative:
+    Tenofovir ELISA Interpretation: [Detected, Not detected, Indeterminate]
+
+Grifols Arboplex:
+  quantitative: [Grifols Arboplex TMA DENV t-time, Grifols Arboplex TMA ZIKV t-time, Grifols Arboplex TMA CHIKV t-time, Effective MP Size]
+  qualitative:
+    Grifols Arboplex TMA DENV Interpretation: [Reactive, Non-reactive]
+    Grifols Arboplex TMA ZIKV Interpretation: [Reactive, Non-reactive]
+    Grifols Arboplex TMA CHIKV Interpretatio: [Non-reactive, Reactive]
+
+MSD V-PLEX CoV2G:
+  quantitative: [MSD V-PLEX CoV2G NC AU/mL, MSD V-PLEX CoV2G S1-RBD AU/mL, MSD V-PLEX CoV2G S AU/mL]
+  qualitative:
+    MSD V-PLEX CoV2G Interpretation: [Equivocal, QNS, Non-reactive, Reactive]
+
+MSD V-PLEX CoV2 ACE2:
+  quantitative: [MSD V-PLEX CoV2 S1-RBD units/mL, MSD V-PLEX CoV2 S1-RBD %inhibition, MSD V-PLEX CoV2 S units/mL, MSD V-PLEX CoV2 S %inhibition]
+  qualitative:
+    MSD V-PLEX CoV2 S1-RBD Interpretation: [Non-Reactive-BLQ, Reactive-ALD, Reactive-ALQ, Reactive-cutoff, Reactive, Non-Reactive, QNS, Non-Reactive-BLD]
+    MSD V-PLEX CoV2 S Interpretation: [Reactive-ALQ, Non-Reactive, Non-Reactive-BLD, Non-Reactive-BLQ, QNS, Reactive, Reactive-ALD]
+
+LAg:
+  quantitative: [LAg_Operator, LAg Final ODn, LAg_kit, LAg_initial_date, LAg_conf_date, LAg_init_ODn, LAg_init_OD, LAg_init_med_cal_od, LAg_conf_OD_1, LAg_conf_OD_2, LAg_conf_OD_3, LAg_conf_med_cal_od, LAg_conf_ODn_1, LAg_conf_ODn_2, LAg_conf_ODn_3, LAg_conf_ODn]
+  qualitative:
+    LAg Final Classification: [LT, Recent]
+
+Aptima HIV TMA Viral Load:
+  quantitative: HIV Viral Load
+  qualitative:
+    HIV Viral Load Interpretation: [Invalid, Not detected, Detected, '>10,000,000', <30 detected, Reactive, Non-Reactive]
+    Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
+
+Aptima HCV TMA Viral Load:
+  quantitative: HCV Viral Load
+  qualitative:
+    HCV Viral Load Interpretation: [Not detected, Invalid, Detected, '>100,000,000', <10 detected]
+    Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
+
+Aptima HBV TMA Viral Load:
+  quantitative: HBV Viral Load
+  qualitative:
+    HBV Viral Load Interpretation: [<10  detected, '>1,000,000,000', Detected, Not detected, Invalid, Non-Reactive, Reactive]
+    Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+  add_date: yes
+
+Vitros CoV2 N tot Ig:
+  quantitative: Vitros CoV2 N tot Ig S/CO
+  qualitative:
+    Vitros CoV2 N tot Ig Interpretation: [Reactive, Non-reactive, QNS]
+
+Coulter Component Count:
+  quantitative: [HgB Count1, HgB Count 2]
+  qualitative:
+
+Sequencing:
+  quantitative:
+  qualitative:
+    Sequencing Interpretation: [Successful, Not successful]
+
+MSD CoV2 Multiplex IgA:
+  quantitative: [MSD Multiplex IgA S, MSD Multiplex IgA RBD, MSD Multiplex IgA NC]
+  qualitative:
+
+Vitros CoV2 S qIgG:
+  quantitative: [Dilution Factor of Final Result, Reagent Lot Number, Results BAU/ml]
+  qualitative:
+    Quant Result Within LOQ: [Within LOQ, <LOQ, '>LOQ', Not detected]
+    Vitros CoV2 S qIgG Interpretation: [Reactive, Non-reactive, QNS]
+
+Procleix CoV2 TMA:
+  quantitative: [Procleix CoV2 TMA SCO, Procleix CoV2 TMA SCO 2, Procleix CoV2 TMA SCO 3, Procleix CoV2 TMA SCO 4, Procleix CoV2 TMA SCO 5, Procleix CoV2 TMA SCO 6, Procleix CoV2 TMA SCO 7, Procleix CoV2 TMA SCO 8, Procleix CoV2 TMA SCO 9, Procleix CoV2 TMA SCO 10, Procleix CoV2 TMA SCO 11, Procleix CoV2 TMA SCO 12, Dilution Factor of Final Result]
+  qualitative:
+    Procleix CoV2 TMA Interpretation: [Reactive, Non-reactive, QNS]
+    Procleix CoV2 TMA Interpretation 2: [Reactive, Non-reactive, QNS]
+    Procleix CoV2 TMA Interpretation 3: [QNS, Non-reactive, Reactive]
+    Procleix CoV2 TMA Interpretation 4: [QNS, Non-reactive, Reactive]
+    Procleix CoV2 TMA Interpretation 5: [Reactive, QNS, Non-reactive]
+    Procleix CoV2 TMA Interpretation 6: [QNS, Reactive, Non-reactive]
+    Procleix CoV2 TMA Interpretation 7: [Reactive, QNS, Non-reactive]
+    Procleix CoV2 TMA Interpretation 8: [QNS, Non-reactive, Reactive]
+    Procleix CoV2 TMA Interpretation 9: [Reactive, Non-reactive, QNS]
+    Procleix CoV2 TMA Interpretation10: [Reactive, Non-reactive, QNS]
+    Procleix CoV2 TMA Interpretation 11: [Non-reactive, QNS, Reactive]
+    Procleix CoV2 TMA Interpretation 12: [QNS, Reactive, Non-reactive]
+
+HIV Sequencing:
+  quantitative: [PI SDRMs (Pro) 1, PI SDRMs (Pro), NNRTI SDRMs (RT) 1, NNRTI SDRMs (RT), NRTI SDRMs (RT) 1, NRTI SDRMs (RT)]
+  qualitative:
+    HIV SubType: [HIV-1 CRF 19_cpx, HIV-1 Recombinant of B,D, HIV-1 Subtype G, potential, HIV-1 Subtype C, HIV-1 Subtype B-like, HIV-1 Subtype B, HIV-1 Subtype A (A1)]
+    Successful Sequence: ['NO', 'YES']
+
+HBV Sequencing:
+  quantitative: Drug Resistance Mutation
+  qualitative:
+    HBV Subtype: [HBV Subtype A, HBV Subtype D]
+    Sucessful Sequence: ['YES', 'NO']
+
+HCV Sequencing:
+  quantitative:
+  qualitative:
+    HCV Subtype: [HCV Subtype 1a, HCV Subtype 1b]
+    Successful Sequence: ['NO', 'YES']
+
+RBC IMPACT CHEMISTRY PANEL:
+  quantitative:
+   - Ferritin (ng/mL)
+   - Ferritin Dilution Factor of Final Result
+   - Serum Fe (ug/dL)
+   - Serum Fe Dilution Factor of Final Result
+   - Bilirubin, Total (mg/dL)
+   - Bilirubin, Unconjugated (mg/dL)
+   - Bilirubin, Conjugated (mg/dL)
+   - Total Iron Binding Capacity (ug/dL)
+   - TIBC Dilution Factor of Final Result
+  qualitative:
+    Test Date:
+    Ferritin Flag: ['>','<','']
+    Bilirubin, Total Flag: ['>','<','']
+  add_date: yes
+
+RBC IMPACT MDA:
+  quantitative: MDA (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT PFHb:
+  quantitative: PFHb (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT HEPCIDIN:
+  quantitative: Hepcidin (ng/mL)
+  qualitative:
+  add_date: yes
+
+RBC IMPACT CYTOKINE PANEL:
+  quantitative:
+  - IL6 (pg/mL)
+  - INFg (pg/mL)
+  - MCP-1 (pg/mL)
+  qualitative:
+  add_date: yes
+
+LAg Abbreviated:
+  quantitative:
+    LAg Initial ODn: "character"
+    LAg Confirm ODn: "character"
+    LAg Final ODn: "character"
+  qualitative:
+    LAg Initial Interpretation: ['CONFIRM','LT']
+    LAg Final Classification: ['LT','RECENT','SEROLOGY NEGATIVE']
+  add_date: yes
+
+LAg TTIMS:
+  quantitative:
+    LAg Final ODn: "numeric"
+    LAg_initial_date: "character"
+    LAg_conf_date: "character"
+    LAg_init_ODn: "character"
+    LAg_init_OD: "character"
+    LAg_init_med_cal_od: "character"
+    LAg_conf_OD_1: "character"
+    LAg_conf_OD_2: "character"
+    LAg_conf_OD_3: "character"
+    LAg_conf_med_cal_od: "character"
+    LAg_conf_ODn_1: "character"
+    LAg_conf_ODn_2: "character"
+    LAg_conf_ODn_3: "character"
+    LAg_conf_ODn: "character"
+    LAg_Operator: "character"
+    LAg_kit: "character"
+  qualitative:
+    LAg Final Classification: ['LT', 'RECENT', 'SEROLOGY NEGATIVE']
+  add_date: yes
+
+Ortho VITROS HIV Combo:
+  quantitative:
+  - Ortho VITROS HIV Combo S/CO
+  qualitative:
+    Ortho VITROS HIV Combo Interpretation: ['Reactive','Non-Reactive','Invalid','QNS']
 
